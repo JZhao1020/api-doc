@@ -1,0 +1,30 @@
+{
+    "name": "hao/api-doc",
+    "homepage": "https://github.com/JZhao1020/api-doc",
+    "description": "thinkphp5 api-doc",
+    "type": "think-extend",
+    "authors": [
+        {
+            "name": "hao",
+            "email": "18816784184@163.com"
+        }
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Api\\Doc\\": "src"
+        },
+        "files": [
+            "src/helper.php"
+        ]
+    },
+    "require": {
+        "topthink/think-helper": ">=1.0.4",
+        "topthink/think-installer": ">=1.0.10"
+    },
+    "extra": {
+        "think-config": {
+            "doc": "src/config.php"
+        }
+    }
+}
