@@ -67,6 +67,9 @@ class Reflection{
      */
     public function getList(){
         $list = [];
+        if(!isset($this->controller))
+            return [];
+
         foreach ($this->controller as $key => $val) {
             $reflection = new \ReflectionClass($val);
             $class_doc = $reflection->getDocComment();
@@ -75,6 +78,9 @@ class Reflection{
             //只允许生成public方法
             $method = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
             $action_doc = [];
+            if(!isset($method))
+                continue;
+
             foreach ($method as $action) {
                 if (!in_array($action->name, $this->filter_method)) {
                     $doc_str = $action->getDocComment();
