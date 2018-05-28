@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------
-// | pay-php-sdk 操作文件的注释
+// | 获取在线接口备注信息
 // +----------------------------------------------------------------------
 // | 版权所有
 // +----------------------------------------------------------------------
@@ -13,27 +13,17 @@ namespace Api\Doc;
 
 class Reflection{
     private $params = array ();
-    public $controller = []; //需要生成接口文档的类路径
     public $filter_method = ['__construct']; //忽略生成的类方法
-
-    public function __construct($config = []){
-        if(isset($config['controller']))
-            $this->controller = $config['controller'];
-
-        if(isset($config['filter_method']))
-            $this->controller = array_merge($this->filter_method,$config['filter_method']);//忽略生成的类方法
-    }
-
-
     /**
      * @param $controller 需要生成接口文档的类路径
      * @param $filter_method 忽略生成的类方法
      * @return array
      * @throws \ReflectionException
      */
-    public function doc(){
+    public function doc($controller,$filter_method = []){
+        $filter_method = array_merge($this->filter_method,$filter_method);//忽略生成的类方法
         $list = [];
-        foreach ($this->controller as $key => $val) {
+        foreach ($controller as $key => $val) {
             $reflection = new \ReflectionClass($val);
             $class_doc = $reflection->getDocComment();
             $class_doc = $this->parse($class_doc);
@@ -42,7 +32,7 @@ class Reflection{
             $method = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
             $action_doc = [];
             foreach ($method as $action) {
-                if (!in_array($action->name, $this->filter_method)) {
+                if (!in_array($action->name, $filter_method)) {
                     $doc_str = $action->getDocComment();
                     if ($doc_str) {
                         $action_doc[] = $this->parse($doc_str);
@@ -52,6 +42,7 @@ class Reflection{
 
             $list[$key] = ['class_doc' => $class_doc, 'action_doc' => $action_doc];
         }
+
         return $list;
     }
 
@@ -68,7 +59,7 @@ class Reflection{
         if (preg_match ( '#^/\*\*(.*)\*/#s', $doc, $comment ) === false)
             return $this->params;
 
-         $comment = trim ( $comment [1] );
+        $comment = trim ( $comment [1] );
         // Get all the lines and strip the * from the first character
         if (preg_match_all ( '#^\s*\*(.*)#m', $comment, $lines ) === false)
             return $this->params;
