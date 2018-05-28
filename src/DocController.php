@@ -58,29 +58,14 @@ class DocController
             'view_path' => $this->view_path
         ];
         $this->view =  new View($config);
+        $config = (array)Config::get('doc');
         $this->doc = new Reflection((array)Config::get('doc'));
-
+        
         $this->view->assign('title',$this->doc->__get("title"));
         $this->view->assign('version',$this->doc->__get("version"));
         $this->view->assign('copyright',$this->doc->__get("copyright"));
         $this->root = $this->request->root();
     }
-
-    /**
-     * 显示模板
-     * @param $name
-     * @return mixed
-     */
-    protected function show($name, $vars = [], $replace = [], $config = [])
-    {
-        $re = [
-            "__ASSETS__" => $this->root."/doc/assets"
-        ];
-        $replace = array_merge($re, $replace);
-        $vars = array_merge(['root'=>$this->root], $vars);
-        return $this->view->fetch($name, $vars, $replace, $config);
-    }
-
 
     /**
      * 解析资源
@@ -103,6 +88,21 @@ class DocController
     }
 
     /**
+     * 显示模板
+     * @param $name
+     * @return mixed
+     */
+    protected function show($name, $vars = [], $replace = [], $config = [])
+    {
+        $re = [
+            "__ASSETS__" => $this->root."/doc/assets"
+        ];
+        $replace = array_merge($re, $replace);
+        $vars = array_merge(['root'=>$this->root], $vars);
+        return $this->view->fetch($name, $vars, $replace, $config);
+    }
+
+    /**
      * 文档首页
      * @return mixed
      */
@@ -112,32 +112,10 @@ class DocController
 //        $ip = $this->request->ip();
 //        if(!in_array($ip,Config::get('config.ips')))
 //            return '';
-
-        return $this->show('index');
+        $list = $this->doc->getList();
+        return $this->show('index',['list' => $list]);
     }
 
-    /**
-     * 设置目录树及图标
-     * @param $actions
-     * @return mixed
-     */
-    protected function setIcon($actions, $num = 1)
-    {
-        foreach ($actions as $key=>$moudel){
-            if(isset($moudel['actions'])){
-                $actions[$key]['iconClose'] = $this->root."/doc/assets/js/zTree_v3/img/zt-folder.png";
-                $actions[$key]['iconOpen'] = $this->root."/doc/assets/js/zTree_v3/img/zt-folder-o.png";
-                $actions[$key]['open'] = true;
-                $actions[$key]['isParent'] = true;
-                $actions[$key]['actions'] = $this->setIcon($moudel['actions'], $num = 1);
-            }else{
-                $actions[$key]['icon'] = $this->root."/doc/assets/js/zTree_v3/img/zt-file.png";
-                $actions[$key]['isParent'] = false;
-                $actions[$key]['isText'] = true;
-            }
-        }
-        return $actions;
-    }
 
     /**
      * 接口列表
@@ -145,9 +123,8 @@ class DocController
      */
     public function getList()
     {
-        $list = $this->doc->doc();
-        var_dump($list);
-//        return response(['firstId'=>'', 'list'=>$list], 200, [], 'json');
+        $list = $this->doc->getList();
+        return response(['firstId'=>'', 'list'=>$list], 200, [], 'json');
     }
 
     /**

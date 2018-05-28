@@ -1,9 +1,7 @@
 <?php
 \think\Route::get('doc/assets', "\\Api\\Doc\\DocController@assets",['deny_ext'=>'php|.htacess']);
 \think\Route::get('doc', "\\Api\\Doc\\DocController@index");
-\think\Route::get('doc/list', "\\Api\\Doc\\DocController@getList");
-\think\Route::get('doc/info', "\\Api\\Doc\\DocController@getInfo");
-\think\Route::any('doc/debug', "\\Api\\Doc\\DocController@debug");
+\think\Route::get('list', "\\Api\\Doc\\DocController@getList");
 
 /**
  * curl模拟请求方法

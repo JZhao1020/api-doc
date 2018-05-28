@@ -1,29 +1,73 @@
 <?php
 // +----------------------------------------------------------------------
-// | 获取在线接口备注信息
+// | 获取api接口注释
 // +----------------------------------------------------------------------
 // | 版权所有
 // +----------------------------------------------------------------------
 // | 开源协议 ( https://mit-license.org )
 // +----------------------------------------------------------------------
-// | github开源项目：
+// | github开源项目：https://github.com/JZhao1020/api-doc
 // +----------------------------------------------------------------------
 
 namespace Api\Doc;
 
 class Reflection{
     private $params = array ();
+    public $controller = []; //需要生成接口文档的类路径
     public $filter_method = ['__construct']; //忽略生成的类方法
+
+    protected  $config = [
+        'title'=>'APi接口文档',
+        'version'=>'1.0.0',
+        'copyright'=>'Powered By Zhangweiwei',
+        'controller' => [],
+        'filter_method'=>['_empty'],
+        'return_format' => [
+            'status' => "200/300/301/302",
+            'message' => "提示信息",
+        ]
+    ];
+
+    public function __construct($config = []){
+        $this->config = array_merge($this->config, $config);
+
+        if(isset($config['controller']))
+            $this->controller =  $config['controller'];
+
+        if(isset($config['filter_method']))
+            $this->filter_method = array_merge($this->filter_method, $config['filter_method']);//忽略生成的类方法
+    }
+
     /**
-     * @param $controller 需要生成接口文档的类路径
-     * @param $filter_method 忽略生成的类方法
+     * 使用 $this->name 获取配置
+     * @access public
+     * @param  string $name 配置名称
+     * @return mixed    配置值
+     */
+    public function __get($name){
+        return $this->config[$name];
+    }
+
+    /**
+     * 设置验证码配置
+     * @access public
+     * @param  string $name  配置名称
+     * @param  string $value 配置值
+     * @return void
+     */
+    public function __set($name, $value){
+        if (isset($this->config[$name])) {
+            $this->config[$name] = $value;
+        }
+    }
+
+    /**
      * @return array
      * @throws \ReflectionException
      */
-    public function doc($controller,$filter_method = []){
-        $filter_method = array_merge($this->filter_method,$filter_method);//忽略生成的类方法
+    public function getList(){
         $list = [];
-        foreach ($controller as $key => $val) {
+        foreach ($this->controller as $key => $val) {
             $reflection = new \ReflectionClass($val);
             $class_doc = $reflection->getDocComment();
             $class_doc = $this->parse($class_doc);
@@ -32,7 +76,7 @@ class Reflection{
             $method = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
             $action_doc = [];
             foreach ($method as $action) {
-                if (!in_array($action->name, $filter_method)) {
+                if (!in_array($action->name, $this->filter_method)) {
                     $doc_str = $action->getDocComment();
                     if ($doc_str) {
                         $action_doc[] = $this->parse($doc_str);
@@ -42,7 +86,6 @@ class Reflection{
 
             $list[$key] = ['class_doc' => $class_doc, 'action_doc' => $action_doc];
         }
-
         return $list;
     }
 
@@ -59,7 +102,7 @@ class Reflection{
         if (preg_match ( '#^/\*\*(.*)\*/#s', $doc, $comment ) === false)
             return $this->params;
 
-        $comment = trim ( $comment [1] );
+         $comment = trim ( $comment [1] );
         // Get all the lines and strip the * from the first character
         if (preg_match_all ( '#^\s*\*(.*)#m', $comment, $lines ) === false)
             return $this->params;
@@ -111,7 +154,8 @@ class Reflection{
                 $param_arr = explode(' ',$value);
                 $value = ['code' => $param_arr[0], 'message' => isset($param_arr[1]) ? $param_arr[1] : 'null'];
             }else if($param == 'return'){
-                $value = json_decode($value,true);
+//                $value = $this->formatReturn(json_decode($value,true));
+                $value = self::formatJson($value);
             }
             $array[$param] = $value;
         }
@@ -119,6 +163,11 @@ class Reflection{
         return $array;
     }
 
+    /**
+     * 判断参数类型
+     * @param $type
+     * @return mixed
+     */
     private function getParamType($type){
         $typeMaps = [
             'string' => '字符串',
@@ -132,5 +181,46 @@ class Reflection{
             'object' => '对象',
         ];
         return array_key_exists($type,$typeMaps) ? $typeMaps[$type] : $type;
+    }
+
+    /**
+     * 转换返回数据格式
+     * @param string $json
+     * @return string
+     */
+    public static function formatJson($json = '')
+    {
+        $result = '';
+        $pos = 0;
+        $strLen = strlen($json);
+        $indentStr = '&nbsp;';
+        $newLine = "<br>";
+        $prevChar = '';
+        $outOfQuotes = true;
+        for ($i = 0; $i <= $strLen; $i++) {
+            $char = substr($json, $i, 1);
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+            } else if (($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine;
+                $pos--;
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+            $result .= $char;
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine;
+                if ($char == '{' || $char == '[') {
+                    $pos++;
+                }
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+            $prevChar = $char;
+        }
+
+        return $result;
     }
 }

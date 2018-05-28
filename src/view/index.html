@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线文档api</title>
+    <link href='__ASSETS__/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <link href='__ASSETS__/css/style.css' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+
+{foreach name="$list" item="vo"}
+    {foreach name="$vo['action_doc']" item="vv"}
+    <div class="container">
+        <div class="jumbotron">
+            <h2>接口：{$vv['title']}</h2>
+            <p>接口地址：{$vv['url']} <span class="label label-success">{$vv['method']}</span></p>
+            <p class="text-primary">开发人员：{$vv['author']}</p>
+            <br>
+            <p><strong>{$vv['description']}</strong></p><br>
+
+
+            <div class="tab-content">
+                <!--info-->
+                <div class="tab-pane fade in active" id="info">
+                    <!--<h3>接口参数</h3>-->
+                    <ul id="myTab" class="nav nav-tabs">
+                        <li class="active"><a href="#info" data-toggle="tab">接口参数</a></li>
+                    </ul>
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr><th>参数名字</th><th>类型</th><th>是否必须</th><th>默认值</th><th>说明</th></tr>
+                        {foreach name="$vv['param']" item="param"}
+                        <tr>
+                            <td>{$param['name']}</td>
+                            <td>{$param['type']}</td>
+                            <td>{$param['require']}</td>
+                            <td>{$param['default']}</td>
+                            <td>{$param['desc']}</td>
+                        </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                    <br>
+                    <ul id="myTab" class="nav nav-tabs">
+                        <li class="active"><a href="#info" data-toggle="tab">返回码</a></li>
+                    </ul>
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr><th>返回码</th><th>说明</th></tr>
+                            {foreach name="$vv['code']" item="code"}
+                            <tr>
+                                <td style="width: 200px;">{$code['code']}</td>
+                                <td>{$code['message']}</td>
+                            </tr>
+                        {/foreach}
+                        </tbody>
+                    </table>
+                    <br>
+                    <h3>返回结果</h3>
+                    <p>
+                        <code id="json_text">
+                            {$vv['return']}
+                        </code>
+                    </p>
+                </div>
+                <!--info-->
+            </div>
+            <br>
+        </div>
+    </div>
+    {/foreach}
+{/foreach}
+</body>
+</html>
