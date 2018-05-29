@@ -25,6 +25,10 @@ class DocController
      */
     protected $doc;
     /**
+     * @var config
+     */
+    protected $config;
+    /**
      * @var array 资源类型
      */
     protected $mimeType = [
@@ -58,12 +62,8 @@ class DocController
             'view_path' => $this->view_path
         ];
         $this->view =  new View($config);
-        $config = (array)Config::get('doc');
+        $this->config = (array)Config::get('doc');
         $this->doc = new Reflection((array)Config::get('doc'));
-        
-        $this->view->assign('title',$this->doc->__get("title"));
-        $this->view->assign('version',$this->doc->__get("version"));
-        $this->view->assign('copyright',$this->doc->__get("copyright"));
         $this->root = $this->request->root();
     }
 
@@ -108,10 +108,11 @@ class DocController
      */
     public function index()
     {
-        //新增，判断是否在允许的ip数组中
-//        $ip = $this->request->ip();
-//        if(!in_array($ip,Config::get('config.ips')))
-//            return '';
+        if($this->config['is_ip']) {
+            $ip = $this->request->ip();
+            if (!in_array($ip, $this->config['ips']))
+                return '';
+        }
         $list = $this->doc->getList();
         $menu = $this->doc->getMenu();
         return $this->show('index',['list' => $list,'menu' => $menu]);
