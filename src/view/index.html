@@ -33,11 +33,11 @@
 <div class="container">
     <div class="col-md-3">
         <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix menu">
-            <ul class="nav bs-docs-sidenav">
+            <ul class="nav bs-docs-sidenav menu-nav">
                 {foreach name="$menu" item="vo" key="key"}
                 <li class="{if condition='$key == 0'}active{/if}">
                     <a href="#{$vo['title']}">{$vo['title']}</a>
-                    <ul class="nav" style="margin-left: 20px;">
+                    <ul class="nav menu-nav" style="margin-left: 20px;">
                         {foreach name="$vo['menu']" item="vv"}
                         <li><a href="#{$vv['url']}">{$vv['title']}</a></li>
                         {/foreach}
@@ -122,10 +122,10 @@
 </div>
 <script type="text/javascript">
     $(function () {
-        $(".nav").on("click","li",function(){      //只需要找到你点击的是哪个ul里面的就行
+        $(".menu-nav").on("click","li",function(){      //只需要找到你点击的是哪个ul里面的就行
             if($(this).hasClass('active')){
             }else{
-                $('.nav > li').removeClass('active');
+                $('.menu-nav > li').removeClass('active');
                 $(this).addClass('active');
             }
 
