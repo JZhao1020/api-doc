@@ -17,15 +17,8 @@ class Reflection{
     public $filter_method = ['__construct']; //忽略生成的类方法
 
     protected  $config = [
-        'title'=>'APi接口文档',
-        'version'=>'1.0.0',
-        'copyright'=>'Powered By Zhangweiwei',
         'controller' => [],
         'filter_method'=>['_empty'],
-        'return_format' => [
-            'status' => "200/300/301/302",
-            'message' => "提示信息",
-        ]
     ];
 
     public function __construct($config = []){
@@ -80,7 +73,6 @@ class Reflection{
 
             //只允许生成public方法
             $method = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-            $action_doc = [];
             if(!isset($method))
                 continue;
 
