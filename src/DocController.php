@@ -113,7 +113,8 @@ class DocController
 //        if(!in_array($ip,Config::get('config.ips')))
 //            return '';
         $list = $this->doc->getList();
-        return $this->show('index',['list' => $list]);
+        $menu = $this->doc->getMenu();
+        return $this->show('index',['list' => $list,'menu' => $menu]);
     }
 
 
@@ -124,6 +125,11 @@ class DocController
     public function getList()
     {
         $list = $this->doc->getList();
+        return response(['firstId'=>'', 'list'=>$list], 200, [], 'json');
+    }
+
+    public function getMenu(){
+        $list = $this->doc->getMenu();
         return response(['firstId'=>'', 'list'=>$list], 200, [], 'json');
     }
 

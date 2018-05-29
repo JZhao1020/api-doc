@@ -62,6 +62,43 @@ class Reflection{
     }
 
     /**
+     * 获取侧边快速定位菜单
+     * @return array
+     * @throws \ReflectionException
+     */
+    public function getMenu(){
+        $list = [];
+        if(!isset($this->controller))
+            return [];
+
+        foreach ($this->controller as $key => $val) {
+            $reflection = new \ReflectionClass($val);
+            $class_doc = $reflection->getDocComment();
+            $class_doc = $this->parse($class_doc);
+
+            $list[$key]['title'] = $class_doc['title'];
+
+            //只允许生成public方法
+            $method = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
+            $action_doc = [];
+            if(!isset($method))
+                continue;
+
+            foreach ($method as $action) {
+                if (!in_array($action->name, $this->filter_method)) {
+                    $doc_str = $action->getDocComment();
+                    if ($doc_str) {
+                        $action_doc = $this->parse($doc_str);
+                        $list[$key]['menu'][] = ['title' => $action_doc['title'], 'url' => $action_doc['url']];
+                    }
+                }
+            }
+        }
+        return $list;
+    }
+
+    /**
+     * 获取接口备注信息
      * @return array
      * @throws \ReflectionException
      */

@@ -5,73 +5,132 @@
     <title>在线文档api</title>
     <link href='__ASSETS__/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
     <link href='__ASSETS__/css/style.css' rel='stylesheet' type='text/css'>
+    <script src="__ASSETS__/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="__ASSETS__/js/bootstrap.min.js" type="text/javascript"></script>
     <style type="text/css">
-
+        .menu,.text{
+            margin: 20px 0;
+        }
+        .nav > li > a ,.back-to-top{
+            padding: 2px 15px;
+        }
+        .nav > li >ul{
+            display: none;
+        }
+        .nav > .active > ul {
+            display: block;
+        }
+        .bs-docs-sidebar .nav>.active:focus>a, .bs-docs-sidebar .nav>.active:hover>a, .bs-docs-sidebar .nav>.active>a {
+            padding-left: 18px;
+            font-weight: 700;
+            color: #563d7c;
+            background-color: transparent;
+            border-left: 2px solid #563d7c;
+        }
     </style>
 </head>
 <body>
-
-{foreach name="$list" item="vo"}
-    {foreach name="$vo['action_doc']" item="vv"}
-    <div class="container">
-        <div class="jumbotron">
-            <h2>接口：{$vv['title']}</h2>
-            <p>接口地址：{$vv['url']} <span class="label label-success">{$vv['method']}</span></p>
-            <p class="text-primary">开发人员：{$vv['author']}</p>
-            <br>
-            <p><strong>{$vv['description']}</strong></p><br>
-
-
-            <div class="tab-content">
-                <!--info-->
-                <div class="tab-pane fade in active" id="info">
-                    <!--<h3>接口参数</h3>-->
-                    <ul id="myTab" class="nav nav-tabs">
-                        <li class="active"><a href="#info" data-toggle="tab">接口参数</a></li>
-                    </ul>
-                    <table class="table table-striped">
-                        <tbody>
-                        <tr><th>参数名字</th><th>类型</th><th>是否必须</th><th>默认值</th><th>说明</th></tr>
-                        {foreach name="$vv['param']" item="param"}
-                        <tr>
-                            <td>{$param['name']}</td>
-                            <td>{$param['type']}</td>
-                            <td>{$param['require']}</td>
-                            <td>{$param['default']}</td>
-                            <td>{$param['desc']}</td>
-                        </tr>
+<div class="container">
+    <div class="col-md-3">
+        <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix menu">
+            <ul class="nav bs-docs-sidenav">
+                {foreach name="$menu" item="vo" key="key"}
+                <li class="{if condition='$key == 0'}active{/if}">
+                    <a href="#{$vo['title']}">{$vo['title']}</a>
+                    <ul class="nav" style="margin-left: 20px;">
+                        {foreach name="$vo['menu']" item="vv"}
+                        <li><a href="#{$vv['url']}">{$vv['title']}</a></li>
                         {/foreach}
-                        </tbody>
-                    </table>
-                    <br>
-                    <ul id="myTab" class="nav nav-tabs">
-                        <li class="active"><a href="#info" data-toggle="tab">返回码</a></li>
                     </ul>
-                    <table class="table table-striped">
-                        <tbody>
+                </li>
+                {/foreach}
+            </ul>
+            <a class="back-to-top" href="#top">
+                返回顶部
+            </a>
+        </nav>
+
+    </div>
+    <div class="col-md-9 col-md-push-3 text" style="left: 0;">
+        <a name="top"></a>
+        {foreach name="$list" item="vo"}
+        <h2><a name="{$vo['class_doc']['title']}"></a>{$vo['class_doc']['title']}</h2>
+        {foreach name="$vo['action_doc']" item="vv"}
+        <a name="{$vv['url']}"></a>
+        <div class="" >
+            <div class="jumbotron">
+                <h2>接口：{:isset($vv['title'])?$vv['title']:'接口标题'}</h2>
+                <p>接口地址：{$vv['url']} <span class="label label-success">{:isset($vv['method'])?$vv['method']:'请求方式'}</span></p>
+                <p class="text-primary">开发人员：{:isset($vv['author'])?$vv['author']:''}</p>
+                <br>
+                <p><strong>{:isset($vv['description'])?$vv['description']:''}</strong></p><br>
+
+
+                <div class="tab-content">
+                    <!--info-->
+                    <div class="tab-pane fade in active" id="info">
+                        <!--<h3>接口参数</h3>-->
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active"><a href="#info" data-toggle="tab">接口参数</a></li>
+                        </ul>
+                        <table class="table table-striped">
+                            <tbody>
+                            <tr><th>参数名字</th><th>类型</th><th>是否必须</th><th>默认值</th><th>说明</th></tr>
+                            {foreach name="$vv['param']" item="param"}
+                            <tr>
+                                <td>{$param['name']}</td>
+                                <td>{$param['type']}</td>
+                                <td>{$param['require']}</td>
+                                <td>{$param['default']}</td>
+                                <td>{$param['desc']}</td>
+                            </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                        <br>
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active"><a href="#info" data-toggle="tab">返回码</a></li>
+                        </ul>
+                        <table class="table table-striped">
+                            <tbody>
                             <tr><th>返回码</th><th>说明</th></tr>
                             {foreach name="$vv['code']" item="code"}
                             <tr>
                                 <td style="width: 200px;">{$code['code']}</td>
                                 <td>{$code['message']}</td>
                             </tr>
-                        {/foreach}
-                        </tbody>
-                    </table>
-                    <br>
-                    <h3>返回结果</h3>
-                    <p>
-                        <code id="json_text">
-                            {$vv['return']}
-                        </code>
-                    </p>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                        <br>
+                        <h3>返回结果</h3>
+                        <p>
+                            <code id="json_text">
+                                {$vv['return']}
+                            </code>
+                        </p>
+                    </div>
+                    <!--info-->
                 </div>
-                <!--info-->
+                <br>
             </div>
-            <br>
         </div>
+        {/foreach}
+        {/foreach}
     </div>
-    {/foreach}
-{/foreach}
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".nav").on("click","li",function(){      //只需要找到你点击的是哪个ul里面的就行
+            if($(this).hasClass('active')){
+            }else{
+                $('.nav > li').removeClass('active');
+                $(this).addClass('active');
+            }
+
+        });
+    })
+</script>
 </body>
 </html>

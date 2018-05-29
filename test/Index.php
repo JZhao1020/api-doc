@@ -1,29 +1,3 @@
-# api-doc
-
-### 开源地址
-https://github.com/JZhao1020/api-doc
-
-## 1.安装
-```shell
-// 使用composer安装
-composer require hao/api-doc
-```
-
-####2、配置参数
-安装好扩展后在 application\extra\ 文件夹下会生成 doc.php 配置文件
-在controller参数中添加对应的类
-```
-    'controller' => [
-        'app\\api\\controller\\Demo'
-    ]
-```
-
-####3、在相关接口类中增加注释参数( group 参数将接口分组，可选)
-方法如下：返回参数支持数组及多维数组（参考test文件夹中的Index.php文件）
-
-### 接口备注示例
-返回数据格式，仅支持json数据格式
-```
 <?php
 namespace app\reflection\controller;
 
@@ -72,6 +46,3 @@ class Index{
 
     }
 }
-```
-####4、在浏览器访问http://你的域名/doc 查看接口文档
-
