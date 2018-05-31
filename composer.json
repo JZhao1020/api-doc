@@ -9,6 +9,9 @@
             "email": "18816784184@163.com"
         }
     ],
+    "keywords": [
+        "api-doc"
+    ],
     "license": "MIT",
     "autoload": {
         "psr-4": {
